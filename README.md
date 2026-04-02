@@ -106,7 +106,7 @@ MAIL_PASS=your_mail_password
 ```bash
 # Clone the repository
 git clone https://github.com/Hojiakbarxon/edu-erp-api.git
-cd edu-erp
+cd edu-erp-api
 
 # Install dependencies
 npm install
@@ -119,7 +119,7 @@ cp .env.example .env
 npm run start:dev
 ```
 
-The server starts at `http://localhost:3000` and all routes are prefixed with `/api`.
+The server starts at `http://localhost:port` and all routes are prefixed with `/api`.
 
 ---
 
