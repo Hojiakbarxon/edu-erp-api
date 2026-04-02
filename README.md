@@ -105,7 +105,7 @@ MAIL_PASS=your_mail_password
 
 ```bash
 # Clone the repository
-git clone https://github.com/Hojiakbarxon/edu-erp.git
+git clone https://github.com/Hojiakbarxon/edu-erp-api.git
 cd edu-erp
 
 # Install dependencies
