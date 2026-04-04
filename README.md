@@ -194,10 +194,9 @@ On app startup:
 ## 🛠️ Installation
 
 ```bash
-<<<<<<< HEAD
+
 # Clone the repository
 =======
->>>>>>> 0ee413b (file uploads were added, users will be checked before updating lessons)
 git clone https://github.com/Hojiakbarxon/edu-erp-api.git
 cd edu-erp-api
 
@@ -206,11 +205,11 @@ npm install
 npm run start:dev
 ```
 
-<<<<<<< HEAD
+
 The server starts at `http://localhost:port` and all routes are prefixed with `/api`.
 
 =======
->>>>>>> 0ee413b (file uploads were added, users will be checked before updating lessons)
+
 ---
 
 
@@ -225,9 +224,8 @@ The server starts at `http://localhost:port` and all routes are prefixed with `/
 
 ## 📄 License
 
-<<<<<<< HEAD
-This project is private and unlicensed — for educational/internal use only.
-=======
+
+
 Private project — for educational and portfolio use.
 
 ---
@@ -239,4 +237,4 @@ Private project — for educational and portfolio use.
 * Backend Developer
 
 ---
->>>>>>> 0ee413b (file uploads were added, users will be checked before updating lessons)
+
