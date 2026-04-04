@@ -7,23 +7,23 @@ import { VideoOfLesson } from 'src/videos-of-lessons/entities/videos-of-lesson.e
 @Entity('lessons')
 export class Lesson {
     @PrimaryGeneratedColumn('increment')
-    id: number
+    id: number 
 
     @Column({ type: 'varchar' })
-    title: string
+    title: string 
 
     @Column({ type: 'time' })
     start_time: string
-
+     
     @Column({ type: 'time' })
-    end_time: string
+    end_time: string 
 
     @ManyToOne(() => Group, (group) => group.lessons, { onDelete: 'CASCADE' })
-    group: Group
+    group: Group 
 
     @OneToMany(() => Homework, (hw) => hw.lesson)
     homeworks: Homework[]
-
+     
     @OneToMany(() => VideoOfLesson, (vd) => vd.lesson)
-    videos: VideoOfLesson[]
+    videos: VideoOfLesson[] 
 }

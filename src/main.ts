@@ -7,6 +7,8 @@ import { DataSource } from 'typeorm';
 import { User } from './users/entities/user.entity';
 import { UserRoles } from './enums';
 import { Crypto } from './utils/Crypto';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 
 async function createSuperAdmin(app) {
@@ -33,7 +35,10 @@ async function createSuperAdmin(app) {
 }
 async function bootstrap() {
   let port = envCongig.port
-  const app = await NestFactory.create(AppModule);
+  
+  const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads' })
+
   app.setGlobalPrefix(`api`)
   app.use(cookieParser())
   app.useGlobalPipes(

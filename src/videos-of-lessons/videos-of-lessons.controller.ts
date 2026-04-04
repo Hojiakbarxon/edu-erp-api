@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { VideosOfLessonsService } from './videos-of-lessons.service';
 import { CreateVideosOfLessonDto } from './dto/create-videos-of-lesson.dto';
 import { UpdateVideosOfLessonDto } from './dto/update-videos-of-lesson.dto';
@@ -6,6 +6,11 @@ import { UserRoles } from 'src/enums';
 import { RoleGurd } from 'src/guards/role.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { videoStorage } from 'src/utils/storage-control';
 
 @Controller('videos-of-lessons')
 export class VideosOfLessonsController {
@@ -14,8 +19,9 @@ export class VideosOfLessonsController {
   @UseGuards(AuthGuard, RoleGurd)
   @Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.TEACHER)
   @Post()
-  create(@Body() createVideosOfLessonDto: CreateVideosOfLessonDto) {
-    return this.videosOfLessonsService.create(createVideosOfLessonDto);
+  @UseInterceptors(FileInterceptor('video', videoStorage))
+  create(@Body() createVideosOfLessonDto: CreateVideosOfLessonDto, @CurrentUser() currentUser: { id: number, role: UserRoles }, @UploadedFile() video: Express.Multer.File) {
+    return this.videosOfLessonsService.create(createVideosOfLessonDto, currentUser, video);
   }
 
   @UseGuards(AuthGuard)
@@ -33,8 +39,9 @@ export class VideosOfLessonsController {
   @UseGuards(AuthGuard, RoleGurd)
   @Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.TEACHER)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVideosOfLessonDto: UpdateVideosOfLessonDto) {
-    return this.videosOfLessonsService.update(+id, updateVideosOfLessonDto);
+  @UseInterceptors(FileInterceptor('video', videoStorage))
+  update(@Param('id') id: string, @Body() updateVideosOfLessonDto: UpdateVideosOfLessonDto, @CurrentUser() currentUser: { id: number, role: UserRoles }, @UploadedFile() videoFile: Express.Multer.File) {
+    return this.videosOfLessonsService.update(+id, updateVideosOfLessonDto, currentUser, videoFile);
   }
 
   @UseGuards(AuthGuard, RoleGurd)
