@@ -20,7 +20,6 @@ import { FileOfHomework } from './files-of-homework/entities/files-of-homework.e
 import { VideosOfLessonsModule } from './videos-of-lessons/videos-of-lessons.module';
 import { VideoOfLesson } from './videos-of-lessons/entities/videos-of-lesson.entity';
 import { AuthModule } from './auth/auth.module';
-import { Reflector } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -36,6 +35,6 @@ import { Reflector } from '@nestjs/core';
     }), MajorModule, RoomsModule, UsersModule, GroupsModule, LessonsModule, HomeworkModule, FilesOfHomeworkModule, VideosOfLessonsModule, AuthModule
   ],
   controllers: [AppController],
-  providers: [AppService, Reflector],
+  providers: [AppService],
 })
 export class AppModule { }

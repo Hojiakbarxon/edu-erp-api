@@ -1,4 +1,4 @@
-import { ConflictException, NotFoundException, UnauthorizedException } from "@nestjs/common"
+import { ConflictException, ForbiddenException, NotFoundException, UnauthorizedException } from "@nestjs/common"
 
 export class Conflicts {
     static async mustExist(field: object, repo: any, entity: string, options?: object) {
@@ -37,5 +37,12 @@ export class Conflicts {
             throw new UnauthorizedException(`The password or email is wrong`)
         }
         return exist
+    }
+
+    static checkMemebr(id: number, users: any[]) {
+        let isMember = users.some(u => u.id === id)
+        if (!isMember) {
+            throw new ForbiddenException(`You have no rights to this action`)
+        }
     }
 }

@@ -9,6 +9,8 @@ import { User } from 'src/users/entities/user.entity';
 import { Conflicts } from 'src/utils/check-existance';
 import { ISuccess } from 'src/utils/success.response';
 import { Room } from 'src/rooms/entities/room.entity';
+import { unlink } from 'fs/promises';
+import { join } from 'path';
 
 @Injectable()
 export class GroupsService {
@@ -118,7 +120,34 @@ export class GroupsService {
   }
 
   async remove(id: number): Promise<ISuccess> {
-    await Conflicts.mustExist({ id }, this.groupRepo, 'group')
+    let group = await this.groupRepo.findOne({
+      where: { id },
+      relations: {
+        lessons: { homeworks: { files: true }, videos: true }
+      }
+    }) as Group
+
+    for (let ls of group.lessons) {
+      for (let hw of ls.homeworks) {
+        for (let file of hw.files) {
+          try {
+            await unlink(join(process.cwd(), file.file))
+          } catch (error) {
+            console.log(error)
+          }
+        }
+      }
+    }
+
+    for (let ls of group.lessons) {
+      for (let video of ls.videos) {
+        try {
+          await unlink(join(process.cwd(), video.video))
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    }
 
     await this.groupRepo.delete({ id })
 

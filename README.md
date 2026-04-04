@@ -1,23 +1,40 @@
-# 🎓 EduERP — Education Management System API
+# 🎓 EduERP — Advanced Education Management System API
 
-A robust, role-based REST API backend for managing an educational institution — built with **NestJS**, **TypeORM**, and **PostgreSQL**. Handles everything from user authentication to lesson management, homework submissions, and file/video attachments.
+A scalable and modular **Education Management System (ERP)** backend built with **NestJS**, **TypeORM**, and **PostgreSQL**.
+
+This API handles **authentication, role-based access control, academic structure, lesson management, homework, and file/video uploads** — designed with real-world architecture practices.
 
 ---
 
-## 🚀 Tech Stack
+## 🚀 Key Features
 
-| Layer | Technology |
-|---|---|
-| Framework | NestJS (Node.js) |
-| Language | TypeScript |
-| ORM | TypeORM |
-| Database | PostgreSQL |
-| Auth | JWT + Cookie-based tokens |
-| Validation | class-validator / class-transformer |
-| Password Hashing | bcrypt |
-| Email | Nodemailer |
-| OTP | otp-generator + node-cache |
-| Config | @nestjs/config + dotenv |
+* 🔐 **Authentication with OTP verification**
+* 🍪 **JWT + Refresh Token (cookie-based)**
+* 🛡️ **Role-Based Access Control (RBAC)**
+* 👥 User roles: `SUPERADMIN`, `ADMIN`, `TEACHER`, `STUDENT`
+* 🏫 Academic system: Majors → Groups → Lessons → Homework
+* 📁 File upload system (homework submissions)
+* 🎥 Video upload system (lesson materials)
+* 🧠 Smart validation & error handling
+* ⚙️ Auto **SuperAdmin seeding** on app startup
+* 🧹 Automatic file cleanup on delete/update
+
+---
+
+## 🧠 Tech Stack
+
+| Layer       | Technology                      |
+| ----------- | ------------------------------- |
+| Framework   | NestJS                          |
+| Language    | TypeScript                      |
+| Database    | PostgreSQL                      |
+| ORM         | TypeORM                         |
+| Auth        | JWT (Access + Refresh)          |
+| Security    | bcrypt (via custom Crypto util) |
+| Validation  | class-validator                 |
+| File Upload | Multer                          |
+| Email       | Nodemailer                      |
+| Cache       | In-memory (OTP handling)        |
 
 ---
 
@@ -25,144 +42,188 @@ A robust, role-based REST API backend for managing an educational institution �
 
 ```
 src/
-├── auth/                   # JWT authentication (login, register, OTP)
-├── users/                  # User management (SUPERADMIN, ADMIN, TEACHER, STUDENT)
-├── major/                  # Academic majors/departments
-├── rooms/                  # Classrooms/lecture rooms
-├── groups/                 # Student groups per major
-├── lessons/                # Lessons assigned to groups
-├── homework/               # Homework assigned per lesson
-├── files-of-homework/      # File attachments for homework submissions
-├── videos-of-lessons/      # Video attachments for lessons
-├── guards/                 # Auth guard (JWT) + Role guard (RBAC)
-├── config/                 # Environment config loader
-├── enums/                  # UserRoles and other enums
-└── utils/                  # Crypto utility (bcrypt wrapper)
+├── auth/                  # Authentication (OTP, login, password reset)
+├── users/                 # User management (roles, profiles)
+├── major/                 # Academic majors
+├── rooms/                 # Classrooms
+├── groups/                # Student groups
+├── lessons/               # Lessons
+├── homework/              # Homework system
+├── files-of-homework/     # Homework file uploads
+├── videos-of-lessons/     # Lesson video uploads
+├── guards/                # AuthGuard + RoleGuard
+├── decorators/            # Custom decorators (Roles, CurrentUser)
+├── utils/                 # Helpers (Crypto, Token, Mail, Cache)
+├── config/                # Environment config
+└── enums/                 # Enums (roles, days, etc.)
 ```
 
 ---
 
-## 🔐 Authentication & Authorization
+## 🔐 Authentication Flow (IMPORTANT)
 
-The API uses a **two-layer guard system**:
+This project uses a **2-step login system with OTP**:
 
-1. **AuthGuard** — Validates the JWT from the request cookie and attaches the decoded user to `req.user`
-2. **RoleGuard** — Reads `req.user.role` and checks it against the `@Roles()` decorator on each route
+### Step 1: Login
 
-**Roles hierarchy:**
-```
-SUPERADMIN → ADMIN → TEACHER → STUDENT
-```
+* User submits email + password
+* If correct → OTP is sent to email
 
-On first startup, a **SuperAdmin** is automatically seeded from environment variables.
+### Step 2: Confirm OTP
+
+* User sends OTP
+* Server returns:
+
+  * `access_token`
+  * `refresh_token` (stored in cookies)
 
 ---
 
-## 🗄️ Data Models
+## 🔄 Token System
+
+* **Access Token** → Used in headers (`Authorization: Bearer ...`)
+* **Refresh Token** → Stored in **httpOnly cookies**
+* Endpoint `/auth/token` → generates new access token
+
+---
+
+## 🛡️ Authorization System
+
+### Guards Used:
+
+* `AuthGuard` → verifies JWT
+* `RoleGuard` → checks roles via `@Roles()`
+
+### Example:
+
+```ts
+@UseGuards(AuthGuard, RoleGuard)
+@Roles(UserRoles.ADMIN)
+```
+
+### Special Role:
+
+* `'SELF'` → allows user to access own data only
+
+---
+
+## 🗄️ Database Design
 
 ```
-Major ──< Group ──< Lesson ──< Homework ──< FileOfHomework
-                       │
-                       └──< VideoOfLesson
-
-User (role: SUPERADMIN | ADMIN | TEACHER | STUDENT)
-Room
+Major
+  └── Group
+        ├── Users
+        ├── Lessons
+              ├── Homework
+              │     └── Files
+              └── Videos
 ```
+
+---
+
+## 📦 File & Video Upload
+
+* Files stored in `/uploads`
+* Served via:
+
+```
+http://localhost:PORT/uploads/...
+```
+
+### Features:
+
+* Old files are **automatically deleted** on update
+* Files are **cleaned up** when parent entity is deleted
 
 ---
 
 ## ⚙️ Environment Variables
 
-Create a `.env` file in the project root:
+Create `.env` file:
 
 ```env
 PORT=3000
 DB_URL=postgres://user:password@localhost:5432/eduerp
 
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=7d
+ACCESS_TOKEN_KEY=secret
+ACCESS_TOKEN_TIME=15m
 
-SUPERADMIN_FULL_NAME=Super Admin
-SUPERADMIN_AGE=30
-SUPERADMIN_PHONE=+998901234567
-SUPERADMIN_PASSWORD=superSecurePassword123
+REFRESH_TOKEN_KEY=secret
+REFRESH_TOKEN_TIME=7d
 
 MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USER=your@email.com
-MAIL_PASS=your_mail_password
+MAIL_PORT=
+MAIL_USER=your_email
+MAIL_PASS=your_password
+
+SUPER_ADMIN_FULL_NAME=
+SUPER_ADMIN_AGE=
+SUPER_ADMIN_PHONE_NUMBER=
+SUPER_ADMIN_PASSWORD=
 ```
 
 ---
 
-## 🛠️ Getting Started
+## 👑 Super Admin Auto-Creation
 
-### Prerequisites
-- Node.js v18+
-- PostgreSQL running locally or via connection URL
+On app startup:
 
-### Installation
+* If no `SUPERADMIN` exists → it will be created automatically
+* Uses `.env` credentials
+* Password is hashed using `Crypto` utility
+
+---
+
+## 📡 API Endpoints
+
+| Module   | Route                    |
+| -------- | ------------------------ |
+| Auth     | `/api/auth`              |
+| Users    | `/api/users`             |
+| Majors   | `/api/major`             |
+| Rooms    | `/api/rooms`             |
+| Groups   | `/api/groups`            |
+| Lessons  | `/api/lessons`           |
+| Homework | `/api/homework`          |
+| Files    | `/api/files-of-homework` |
+| Videos   | `/api/videos-of-lessons` |
+
+---
+
+
+## 🛠️ Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/Hojiakbarxon/edu-erp.git
-cd edu-erp
+git clone https://github.com/Hojiakbarxon/edu-erp-api.git
+cd edu-erp-api
 
-# Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env
-# Fill in your .env values
-
-# Start in development mode
 npm run start:dev
 ```
 
-The server starts at `http://localhost:3000` and all routes are prefixed with `/api`.
-
 ---
 
-## 📡 API Endpoints Overview
-
-| Module | Base Route |
-|---|---|
-| Auth | `/api/auth` |
-| Users | `/api/users` |
-| Majors | `/api/major` |
-| Rooms | `/api/rooms` |
-| Groups | `/api/groups` |
-| Lessons | `/api/lessons` |
-| Homework | `/api/homework` |
-| Homework Files | `/api/files-of-homework` |
-| Lesson Videos | `/api/videos-of-lessons` |
-
----
-
-## 📦 Available Scripts
-
-```bash
-npm run start          # Start production
-npm run start:dev      # Start with hot-reload (watch mode)
-npm run start:debug    # Start in debug mode
-npm run build          # Compile TypeScript
-npm run lint           # Lint and auto-fix
-npm run test           # Run unit tests
-npm run test:e2e       # Run end-to-end tests
-npm run test:cov       # Run tests with coverage report
-```
-
----
 
 ## 🔒 Security Notes
 
-- Passwords are hashed using **bcrypt** before storage
-- JWT tokens are stored in **httpOnly cookies**
-- All incoming requests are validated and stripped of unknown fields via `ValidationPipe` with `whitelist: true` and `forbidNonWhitelisted: true`
-- OTP codes for email verification are stored in-memory using **node-cache** with TTL
+* Passwords hashed before storing
+* Tokens validated in guards
+* ValidationPipe protects API from invalid data
+* Sensitive tokens stored in cookies (httpOnly)
 
 ---
 
 ## 📄 License
 
-This project is private and unlicensed — for educational/internal use only.
+Private project — for educational and portfolio use.
+
+---
+
+## 👨‍💻 Author
+
+**Hojiakbarxon Olimxo'jayev**
+
+* Backend Developer
+
+---

@@ -6,6 +6,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { RoleGurd } from 'src/guards/role.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRoles } from 'src/enums';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
 
 @Controller('lessons')
 export class LessonsController {
@@ -14,8 +15,8 @@ export class LessonsController {
   @UseGuards(AuthGuard, RoleGurd)
   @Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.TEACHER)
   @Post()
-  create(@Body() createLessonDto: CreateLessonDto) {
-    return this.lessonsService.create(createLessonDto);
+  create(@Body() createLessonDto: CreateLessonDto, @CurrentUser() currentUser : {id : number, role : UserRoles}) {
+    return this.lessonsService.create(createLessonDto, currentUser);
   }
 
   @UseGuards(AuthGuard)
@@ -33,8 +34,8 @@ export class LessonsController {
   @UseGuards(AuthGuard, RoleGurd)
   @Roles(UserRoles.SUPERADMIN, UserRoles.ADMIN, UserRoles.TEACHER)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
-    return this.lessonsService.update(+id, updateLessonDto);
+  update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto, @CurrentUser() currentUser : {id : number, role : UserRoles}) {
+    return this.lessonsService.update(+id, updateLessonDto, currentUser);
   }
 
   @UseGuards(AuthGuard, RoleGurd)
