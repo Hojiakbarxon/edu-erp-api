@@ -37,9 +37,9 @@ export class AuthService {
 
         let otp = generateOtp()
         setCache(email, otp)
-        console.log(envCongig, otp)
+
         let sms = await sendMail(user.email, otp)
-        
+
         console.log(sms)
         return {
             statusCode: 200,
@@ -106,7 +106,7 @@ export class AuthService {
         let otp = generateOtp()
         let key = `reset ${email}`
         setCache(key, otp)
-        console.log(otp)
+
         let sms = await sendMail(user?.email, otp)
 
         return {
@@ -120,7 +120,7 @@ export class AuthService {
         let { email, new_password, otp } = bodyData
         let user = await Conflicts.mustExist({ email }, this.userRepo, 'user')
         let data = await getCache(`reset ${email}`)
-        console.log(data)
+
         if (!data || data !== otp) {
             throw new BadRequestException(`OTP expired or incorrect`)
         }
