@@ -1,4 +1,3 @@
-import { group } from "console";
 import { MajorType } from "src/enums";
 import { Group } from "src/groups/entities/group.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";

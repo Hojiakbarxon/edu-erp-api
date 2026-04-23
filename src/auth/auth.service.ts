@@ -14,6 +14,7 @@ import Token from 'src/utils/Token';
 import type { Response, Request } from 'express';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { envCongig } from 'src/config/env.congig';
 
 @Injectable()
 export class AuthService {
@@ -36,8 +37,9 @@ export class AuthService {
 
         let otp = generateOtp()
         setCache(email, otp)
+        console.log(envCongig, otp)
         let sms = await sendMail(user.email, otp)
-
+        
         console.log(sms)
         return {
             statusCode: 200,
@@ -104,6 +106,7 @@ export class AuthService {
         let otp = generateOtp()
         let key = `reset ${email}`
         setCache(key, otp)
+        console.log(otp)
         let sms = await sendMail(user?.email, otp)
 
         return {

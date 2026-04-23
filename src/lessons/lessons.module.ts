@@ -4,10 +4,11 @@ import { LessonsController } from './lessons.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Lesson } from './entities/lesson.entity';
 import { Group } from 'src/groups/entities/group.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
   imports : [
-    TypeOrmModule.forFeature([Lesson, Group])
+    TypeOrmModule.forFeature([Lesson, Group, User])
   ],
   controllers: [LessonsController],
   providers: [LessonsService],

@@ -4,10 +4,11 @@ import { FilesOfHomeworkController } from './files-of-homework.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Homework } from 'src/homework/entities/homework.entity';
 import { FileOfHomework } from './entities/files-of-homework.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([FileOfHomework, Homework])
+    TypeOrmModule.forFeature([FileOfHomework, Homework, User])
   ],
   controllers: [FilesOfHomeworkController],
   providers: [FilesOfHomeworkService],

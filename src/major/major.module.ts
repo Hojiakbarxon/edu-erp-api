@@ -3,9 +3,10 @@ import { MajorService } from './major.service';
 import { MajorController } from './major.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Major } from './entities/major.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Major])],
+  imports : [TypeOrmModule.forFeature([Major, User])],
   controllers: [MajorController],
   providers: [MajorService],
 })

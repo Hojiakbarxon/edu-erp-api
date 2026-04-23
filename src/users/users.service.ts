@@ -23,7 +23,7 @@ export class UsersService {
 
     await Conflicts.mustBeUnique({ phone_number }, this.userRepo, "user", "phone number")
 
-    let hashedPassword = await Crypto.hash(password)
+    let hashedPassword = await Crypto.hash(password)  
 
     let newUser = this.userRepo.create({
       ...createUserDto,

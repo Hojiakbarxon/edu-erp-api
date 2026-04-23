@@ -4,10 +4,11 @@ import { VideosOfLessonsController } from './videos-of-lessons.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VideoOfLesson } from './entities/videos-of-lesson.entity';
 import { Lesson } from 'src/lessons/entities/lesson.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([VideoOfLesson, Lesson])
+    TypeOrmModule.forFeature([VideoOfLesson, Lesson, User])
   ],
   controllers: [VideosOfLessonsController],
   providers: [VideosOfLessonsService],

@@ -159,22 +159,22 @@ export class GroupsService {
   }
 
   async addUserToGroup(grop_id: number, user_id: number): Promise<ISuccess> {
-    await Conflicts.mustExist({ id: grop_id }, this.groupRepo, 'group')
+      await Conflicts.mustExist({ id: grop_id }, this.groupRepo, 'group')
 
-    let group = await this.groupRepo.findOne({
-      where: { id: grop_id },
-      relations: { users: true }
-    }) as Group
+      let group = await this.groupRepo.findOne({
+        where: { id: grop_id },
+        relations: { users: true }
+      }) as Group
 
-    let user = await Conflicts.mustExist({ id: user_id }, this.userRepo, "user")
+      let user = await Conflicts.mustExist({ id: user_id }, this.userRepo, "user")
 
-    let alreadyIn = group?.users.some(user => user.id === user_id)
-    if (alreadyIn) {
-      throw new ConflictException(`User already in this group`)
-    }
-    group?.users.push(user)
+      let alreadyIn = group?.users.some(user => user.id === user_id)
+      if (alreadyIn) {
+        throw new ConflictException(`User already in this group`)
+      }
+      group?.users.push(user)
 
-    await this.groupRepo.save(group)
+      await this.groupRepo.save(group)
 
     return {
       statusCode: 200,

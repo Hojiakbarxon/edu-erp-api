@@ -9,16 +9,17 @@ export let envCongig = {
         host: String(process.env.MAIL_HOST),
         port: Number(process.env.MAIL_PORT)
     },
-    token : {
-        access_key : String(process.env.ACCESS_TOKEN_KEY),
-        access_time : String(process.env.ACCESS_TOKEN_TIME),
-        refresh_key : String(process.env.REFRESH_TOKEN_KEY),
-        refresh_time : String(process.env.REFRESH_TOKEN_TIME)
+    token: {
+        access_key: String(process.env.ACCESS_TOKEN_KEY),
+        access_time: String(process.env.ACCESS_TOKEN_TIME),
+        refresh_key: String(process.env.REFRESH_TOKEN_KEY),
+        refresh_time: String(process.env.REFRESH_TOKEN_TIME)
     },
-    superadmin : {
-        full_name : String(process.env.SUPER_ADMIN_FULL_NAME),
-        age : Number(process.env.SUPER_ADMIN_AGE),
-        phone_number : String(process.env.SUPER_ADMIN_PHONE_NUMBER),
-        password  : String(process.env.SUPER_ADMIN_PASSWORD)
+    superadmin: {
+        full_name: String(process.env.SUPER_ADMIN_FULL_NAME),
+        age: Number(process.env.SUPER_ADMIN_AGE),
+        phone_number: String(process.env.SUPER_ADMIN_PHONE_NUMBER),
+        password: String(process.env.SUPER_ADMIN_PASSWORD),
+        email: String(process.env.SUPER_ADMIN_EMAIL)
     }
 }

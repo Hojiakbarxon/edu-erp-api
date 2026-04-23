@@ -4,8 +4,9 @@ import { envCongig } from "src/config/env.congig";
 export async function sendMail(user: string, message: string) {
     let transporter = nodemailer.createTransport({
         service: "gmail",
+        secure : true,
         host: envCongig.mail.host,
-        port: envCongig.mail.port,
+        port: 465,
         auth: {
             user: envCongig.mail.user,
             pass: envCongig.mail.password

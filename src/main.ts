@@ -9,6 +9,7 @@ import { UserRoles } from './enums';
 import { Crypto } from './utils/Crypto';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 
 async function createSuperAdmin(app) {
@@ -24,7 +25,8 @@ async function createSuperAdmin(app) {
       age: envCongig.superadmin.age,
       password: hashed_password,
       phone_number: envCongig.superadmin.phone_number,
-      role: UserRoles.SUPERADMIN
+      role: UserRoles.SUPERADMIN,
+      email: envCongig.superadmin.email
     })
 
     await userRepo.save(superAdmin)
@@ -35,12 +37,23 @@ async function createSuperAdmin(app) {
 }
 async function bootstrap() {
   let port = envCongig.port
-  
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
   app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads' })
 
   app.setGlobalPrefix(`api`)
   app.use(cookieParser())
+
+  let config = new DocumentBuilder()
+    .setTitle(`ERP system`)
+    .setDescription(`ERP system documentation`)
+    .setVersion(`1.0`)
+    .addBearerAuth()
+    .build()
+
+  let documnet = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup(`/docs`, app, documnet)
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -51,7 +64,7 @@ async function bootstrap() {
   )
 
   await createSuperAdmin(app)
-  
+
   await app.listen(port, () => console.log(`server is running on port`, port));
 
 }
