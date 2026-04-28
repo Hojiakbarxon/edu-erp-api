@@ -40,7 +40,6 @@ export class AuthService {
 
         let sms = await sendMail(user.email, otp)
 
-        console.log(sms)
         return {
             statusCode: 200,
             message: "success",
